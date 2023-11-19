@@ -70,11 +70,6 @@ export class PollController {
       },
     },
   })
-  @authenticate('jwt')
-  @authorize({
-    allowedRoles: ['admin', 'user'],
-    voters: [basicAuthorization],
-  })
   async find(
     @param.filter(Poll) filter?: Filter<Poll>,
   ): Promise<Poll[]> {
@@ -83,11 +78,6 @@ export class PollController {
 
 
   @get('/polls/{id}')
-  @authenticate('jwt')
-  @authorize({
-    allowedRoles: ['admin', 'user'],
-    voters: [basicAuthorization],
-  })
   @authenticate('jwt')
   @authorize({
     allowedRoles: ['admin'],
@@ -100,11 +90,6 @@ export class PollController {
         schema: getModelSchemaRef(Poll, {includeRelations: true}),
       },
     },
-  })
-  @authenticate('jwt')
-  @authorize({
-    allowedRoles: ['admin'],
-    voters: [basicAuthorization],
   })
   async findById(
     @param.path.string('id') id: string,
@@ -137,11 +122,6 @@ export class PollController {
   }
 
   @put('/polls/{id}')
-  @authenticate('jwt')
-  @authorize({
-    allowedRoles: ['admin'],
-    voters: [basicAuthorization],
-  })
   @response(204, {
     description: 'Poll PUT success',
   })

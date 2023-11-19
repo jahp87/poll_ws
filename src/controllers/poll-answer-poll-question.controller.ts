@@ -38,11 +38,6 @@ export class PollAnswerPollQuestionController {
     allowedRoles: ['admin'],
     voters: [basicAuthorization],
   })
-  @authenticate('jwt')
-  @authorize({
-    allowedRoles: ['admin'],
-    voters: [basicAuthorization],
-  })
   async getPollQuestion(
     @param.path.string('id') id: typeof PollAnswer.prototype.id,
   ): Promise<PollQuestion> {
