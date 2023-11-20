@@ -6,6 +6,7 @@ import {
   repository
 } from '@loopback/repository';
 import {
+  HttpErrors,
   del,
   get,
   getModelSchemaRef,
@@ -17,13 +18,19 @@ import {
   response,
 } from '@loopback/rest';
 import {basicAuthorization} from '../middlewares/auth.midd';
-import {Poll} from '../models';
-import {PollRepository} from '../repositories';
+import {Poll, PollResults} from '../models';
+import {PollAnswerRepository, PollQuestionRepository, PollRepository, PollVoteRepository} from '../repositories';
 
 export class PollController {
   constructor(
     @repository(PollRepository)
     public pollRepository: PollRepository,
+    @repository(PollAnswerRepository)
+    public pollAnswerRepository: PollAnswerRepository,
+    @repository(PollVoteRepository)
+    public pollVoteRepository: PollVoteRepository,
+    @repository(PollQuestionRepository)
+    public pollQuestionRepository: PollQuestionRepository,
   ) { }
 
   @post('/polls')
@@ -74,6 +81,70 @@ export class PollController {
     @param.filter(Poll) filter?: Filter<Poll>,
   ): Promise<Poll[]> {
     return this.pollRepository.find(filter);
+  }
+
+  @get('/polls/results/{id}')
+  @authenticate('jwt')
+  @authorize({
+    allowedRoles: ['admin', 'user'],
+    voters: [basicAuthorization],
+  })
+  @response(200, {
+    description: 'Poll model instance',
+    content: {
+      'application/json': {
+        schema: getModelSchemaRef(Poll, {includeRelations: true}),
+      },
+    },
+  })
+  async results(
+    @param.path.string('id') id: string,
+  ): Promise<PollResults[]> {
+    const poll = this.pollRepository.findById(id);
+    if (!poll) {throw new HttpErrors.BadRequest('poll not found');}
+
+    const answers = await this.pollAnswerRepository.find({
+      where: {
+        pollId: id
+      }
+    });
+
+    const questions = await this.pollQuestionRepository.find({
+      where: {
+        pollId: id
+      }
+    });
+
+    let resultResponse: PollResults[] = [];
+
+    for (let answer of answers) {
+      for (let question of questions) {
+        let votes = await this.pollVoteRepository.find({
+          where: {
+            and: [
+              {
+                pollId: id
+              },
+              {
+                pollQuestionId: question.id
+              },
+              {
+                pollAnswerId: answer.id
+              }
+            ]
+          }
+        });
+
+        resultResponse.push({
+          questions: question.content,
+          answer: question.content,
+          votes: votes.length
+        })
+      }
+    }
+
+    return resultResponse;
+
   }
 
 

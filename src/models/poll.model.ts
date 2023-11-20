@@ -1,5 +1,7 @@
 import {Entity, hasMany, model, property} from '@loopback/repository';
+import {PollAnswer} from './poll-answer.model';
 import {PollQuestion} from './poll-question.model';
+import {PollVote} from './poll-vote.model';
 
 @model()
 export class Poll extends Entity {
@@ -48,6 +50,12 @@ export class Poll extends Entity {
   @hasMany(() => PollQuestion)
   pollQuestions: PollQuestion[];
 
+  @hasMany(() => PollAnswer)
+  pollAnswers: PollAnswer[];
+
+  @hasMany(() => PollVote)
+  pollVotes: PollVote[];
+
   constructor(data?: Partial<Poll>) {
     super(data);
   }
@@ -58,3 +66,10 @@ export interface PollRelations {
 }
 
 export type PollWithRelations = Poll & PollRelations;
+
+
+export type PollResults = {
+  questions: string,
+  answer: string,
+  votes: number
+}

@@ -22,8 +22,6 @@ export class User extends Entity {
   })
   role: string;
 
-
-
   @hasOne(() => UserCredentials)
   userCredentials: UserCredentials;
 

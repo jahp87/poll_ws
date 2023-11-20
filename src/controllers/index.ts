@@ -15,3 +15,5 @@ export * from './user.controller';
 export * from './userprofile.controller';
 
 export * from './poll-vote.controller';
+export * from './poll-poll-answer.controller';
+export * from './poll-poll-vote.controller';
