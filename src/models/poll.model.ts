@@ -1,4 +1,4 @@
-import {Entity, model, property, hasMany} from '@loopback/repository';
+import {Entity, hasMany, model, property} from '@loopback/repository';
 import {PollQuestion} from './poll-question.model';
 
 @model()
@@ -32,6 +32,12 @@ export class Poll extends Entity {
     required: true,
   })
   published: string;
+
+  @property({
+    type: 'date',
+    required: true,
+  })
+  closed: string;
 
   @property({
     type: 'string',
