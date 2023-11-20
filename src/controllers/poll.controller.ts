@@ -36,7 +36,7 @@ export class PollController {
   @post('/polls')
   @authenticate('jwt')
   @authorize({
-    allowedRoles: ['admin'],
+    allowedRoles: ['admin', 'power'],
     voters: [basicAuthorization],
   })
   @response(200, {
@@ -63,7 +63,7 @@ export class PollController {
   @get('/polls')
   @authenticate('jwt')
   @authorize({
-    allowedRoles: ['admin'],
+    allowedRoles: ['admin', 'user', 'power'],
     voters: [basicAuthorization],
   })
   @response(200, {
@@ -151,7 +151,7 @@ export class PollController {
   @get('/polls/{id}')
   @authenticate('jwt')
   @authorize({
-    allowedRoles: ['admin'],
+    allowedRoles: ['admin', 'power'],
     voters: [basicAuthorization],
   })
   @response(200, {
@@ -172,7 +172,7 @@ export class PollController {
   @patch('/polls/{id}')
   @authenticate('jwt')
   @authorize({
-    allowedRoles: ['admin'],
+    allowedRoles: ['admin', 'power'],
     voters: [basicAuthorization],
   })
   @response(204, {
@@ -198,7 +198,7 @@ export class PollController {
   })
   @authenticate('jwt')
   @authorize({
-    allowedRoles: ['admin'],
+    allowedRoles: ['admin', 'power'],
     voters: [basicAuthorization],
   })
   async replaceById(
@@ -211,7 +211,7 @@ export class PollController {
   @del('/polls/{id}')
   @authenticate('jwt')
   @authorize({
-    allowedRoles: ['admin'],
+    allowedRoles: ['admin', 'power'],
     voters: [basicAuthorization],
   })
   @response(204, {

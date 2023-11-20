@@ -129,6 +129,31 @@ export class SecurityController {
 
   }
 
+  @post('/security/sign-up/poweruser', {
+    responses: {
+      '200': {
+        description: 'User',
+        content: {
+          'application/json': {
+            schema: {
+              'x-ts-type': User,
+            },
+          },
+        },
+      },
+    },
+  })
+  async signupPowerUser(
+    @requestBody(CredentialsRequestBody) newUserRequest: Credentials,
+  ): Promise<User> {
+    newUserRequest.role = 'power';
+
+
+    return this.sigup(newUserRequest);
+
+
+  }
+
   async sigup(credentials: Credentials): Promise<User> {
 
     // encrypt the password
