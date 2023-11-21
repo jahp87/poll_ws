@@ -11,6 +11,9 @@ import {
   PollQuestion,
 } from '../models';
 import {PollVoteRepository} from '../repositories';
+import {authenticate} from '@loopback/authentication';
+import {authorize} from '@loopback/authorization';
+import {basicAuthorization} from '../middlewares/auth.midd';
 
 export class PollVotePollQuestionController {
   constructor(
@@ -29,6 +32,11 @@ export class PollVotePollQuestionController {
         },
       },
     },
+  })
+  @authenticate('jwt')
+  @authorize({
+    allowedRoles: ['admin', 'user'],
+    voters: [basicAuthorization],
   })
   async getPollQuestion(
     @param.path.string('id') id: typeof PollVote.prototype.id,

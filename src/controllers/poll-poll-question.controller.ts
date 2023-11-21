@@ -43,7 +43,7 @@ export class PollPollQuestionController {
   })
   @authenticate('jwt')
   @authorize({
-    allowedRoles: ['admin', 'user'],
+    allowedRoles: ['admin', 'user', 'power'],
     voters: [basicAuthorization],
   })
   async find(
@@ -60,6 +60,11 @@ export class PollPollQuestionController {
         content: {'application/json': {schema: getModelSchemaRef(PollQuestion)}},
       },
     },
+  })
+  @authenticate('jwt')
+  @authorize({
+    allowedRoles: ['admin', 'power'],
+    voters: [basicAuthorization],
   })
   async create(
     @param.path.string('id') id: typeof Poll.prototype.id,
@@ -86,6 +91,11 @@ export class PollPollQuestionController {
       },
     },
   })
+  @authenticate('jwt')
+  @authorize({
+    allowedRoles: ['admin', 'power'],
+    voters: [basicAuthorization],
+  })
   async patch(
     @param.path.string('id') id: string,
     @requestBody({
@@ -108,6 +118,11 @@ export class PollPollQuestionController {
         content: {'application/json': {schema: CountSchema}},
       },
     },
+  })
+  @authenticate('jwt')
+  @authorize({
+    allowedRoles: ['admin', 'power'],
+    voters: [basicAuthorization],
   })
   async delete(
     @param.path.string('id') id: string,

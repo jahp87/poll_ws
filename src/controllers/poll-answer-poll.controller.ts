@@ -35,7 +35,7 @@ export class PollAnswerPollController {
   })
   @authenticate('jwt')
   @authorize({
-    allowedRoles: ['admin'],
+    allowedRoles: ['admin', 'user', 'power'],
     voters: [basicAuthorization],
   })
   async getPoll(

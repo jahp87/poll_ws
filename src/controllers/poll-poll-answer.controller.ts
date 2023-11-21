@@ -58,7 +58,7 @@ export class PollPollAnswerController {
   })
   @authenticate('jwt')
   @authorize({
-    allowedRoles: ['admin'],
+    allowedRoles: ['admin', 'user', 'power'],
     voters: [basicAuthorization],
   })
   async create(
@@ -88,7 +88,7 @@ export class PollPollAnswerController {
   })
   @authenticate('jwt')
   @authorize({
-    allowedRoles: ['admin'],
+    allowedRoles: ['admin', 'power'],
     voters: [basicAuthorization],
   })
   async patch(
@@ -116,7 +116,7 @@ export class PollPollAnswerController {
   })
   @authenticate('jwt')
   @authorize({
-    allowedRoles: ['admin'],
+    allowedRoles: ['admin', 'power'],
     voters: [basicAuthorization],
   })
   async delete(

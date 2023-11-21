@@ -30,6 +30,35 @@ export class User extends Entity {
   }
 }
 
+
+@model()
+export class ChangePasswordUser {
+  @property({
+    type: 'string',
+
+  })
+  userId: string;
+
+  @property({
+    type: 'string',
+
+  })
+  oldPassword: string;
+
+  @property({
+    type: 'string',
+
+  })
+  newPassword: string;
+
+  @property({
+    type: 'string',
+
+  })
+  confirmNewPassword: string;
+}
+
+
 export interface UserRelations {
   // describe navigational properties here
 }

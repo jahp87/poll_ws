@@ -1,13 +1,15 @@
 // Uncomment these imports to begin using these cool features!
 
-import {TokenService, UserService} from '@loopback/authentication';
+import {TokenService, UserService, authenticate} from '@loopback/authentication';
 import {TokenServiceBindings, UserServiceBindings} from '@loopback/authentication-jwt';
+import {authorize} from '@loopback/authorization';
 import {inject} from '@loopback/core';
 import {repository} from '@loopback/repository';
-import {HttpErrors, SchemaObject, post, requestBody} from '@loopback/rest';
+import {HttpErrors, SchemaObject, getModelSchemaRef, post, requestBody, response} from '@loopback/rest';
 import _ from 'lodash';
 import {PasswordHasherBindings} from '../keys';
-import {User} from '../models';
+import {basicAuthorization} from '../middlewares/auth.midd';
+import {ChangePasswordUser, User} from '../models';
 import {Credentials, UserCredentialsRepository, UserRepository} from '../repositories';
 import {PasswordHasher} from '../services';
 
@@ -48,7 +50,7 @@ export class SecurityController {
     @repository(UserCredentialsRepository) public userCredentialsRepository: UserCredentialsRepository,
   ) { }
 
-  @post('/api/security/login', {
+  @post('/security/login', {
     responses: {
       '200': {
         description: 'Token',
@@ -188,5 +190,78 @@ export class SecurityController {
       throw new HttpErrors.Conflict('Email value is already taken');
 
     }
+  }
+
+  @post('/security/changepassword')
+  @authenticate('jwt')
+  @authorize({
+    allowedRoles: ['admin'],
+    voters: [basicAuthorization],
+  })
+  @response(200, {
+    description: 'User model instance',
+    content: {'application/json': {schema: getModelSchemaRef(User)}},
+  })
+  async changepassword(
+    @requestBody({
+      content: {
+        'application/json': {
+          schema: getModelSchemaRef(ChangePasswordUser),
+        },
+      },
+    })
+    user: ChangePasswordUser
+  ): Promise<User> {
+
+
+    const patter = /(?=(?:.*\d){1})(?=(?:.*[A-Z]){1})(?=(?:.*[a-z]){1})/;
+
+    if (!patter.test(user.newPassword)) {
+      throw new HttpErrors.BadRequest(
+        'La clave debe contener mayúsculas, minúsculas y dígitos'
+      );
+    }
+
+    const foundUser = await this.userRepository.findById(user.userId);
+
+    if (!foundUser) {
+      throw new HttpErrors.BadRequest('User not found');
+    }
+
+    if (user.newPassword !== user.confirmNewPassword) {
+      throw new HttpErrors.BadRequest('Password do not match');
+
+    }
+
+    const userCredentials = await this.userCredentialsRepository.findOne({where: {userId: foundUser.id}})
+    if (!userCredentials) {throw new HttpErrors.BadRequest('Error, Incorrect credentilas')}
+
+    const credentials: Credentials = {
+      email: foundUser.email,
+      password: userCredentials.password
+    }
+
+    const userVerifited = await this.userService.verifyCredentials(credentials);
+
+    if (userVerifited) {
+
+      const password = await this.passwordHasher.hashPassword(
+        user.newPassword,
+      );
+      const objUserCredentials = await this.userCredentialsRepository.findOne(
+        {
+          where: {
+            userId: foundUser.id
+          }
+        }
+      );
+      if (objUserCredentials) {
+        await this.userCredentialsRepository.updateById(objUserCredentials.id, {password});
+      }
+
+    }
+
+
+    return foundUser;
   }
 }
