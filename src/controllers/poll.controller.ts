@@ -169,6 +169,38 @@ export class PollController {
     return this.pollRepository.findById(id, filter);
   }
 
+  @get('/polls/details/{id}')
+  @authenticate('jwt')
+  @authorize({
+    allowedRoles: ['admin', 'power'],
+    voters: [basicAuthorization],
+  })
+  @response(200, {
+    description: 'Poll model instance',
+    content: {
+      'application/json': {
+        schema: getModelSchemaRef(Poll, {includeRelations: true}),
+      },
+    },
+  })
+  async details(
+    @param.path.string('id') id: string,
+  ): Promise<Poll> {
+    return this.pollRepository.findById(id, {
+      include: [
+        {
+          relation: 'pollQuestions'
+        },
+        {
+          relation: 'pollAnswers'
+        },
+        {
+          relation: 'pollVotes'
+        }
+      ]
+    });
+  }
+
   @patch('/polls/{id}')
   @authenticate('jwt')
   @authorize({
