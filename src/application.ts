@@ -1,4 +1,4 @@
-import {JWTService, MyUserService, TokenServiceBindings, TokenServiceConstants, UserServiceBindings} from '@loopback/authentication-jwt';
+import {JWTService, MyUserService, SECURITY_SCHEME_SPEC, TokenServiceBindings, TokenServiceConstants, UserServiceBindings} from '@loopback/authentication-jwt';
 import {BootMixin} from '@loopback/boot';
 import {ApplicationConfig} from '@loopback/core';
 import {RepositoryMixin} from '@loopback/repository';
@@ -32,6 +32,7 @@ export class PollsWsApplication extends BootMixin(
       path: '/explorer',
     });
     this.component(RestExplorerComponent);
+    this.addSecuritySpec();
     this.setUpBindings();
 
     this.projectRoot = __dirname;
@@ -70,6 +71,25 @@ export class PollsWsApplication extends BootMixin(
     this.bind(PasswordHasherBindings.PASSWORD_HASHER).toClass(BcryptHasher);
 
     this.bind(UserServiceBindings.USER_SERVICE).toClass(MyUserService);
+  }
+
+  private addSecuritySpec(): void {
+    this.api({
+      openapi: '3.0.0',
+      info: {
+        title: 'poll ws application',
+        version: '1.0.0',
+      },
+      paths: {},
+      components: {securitySchemes: SECURITY_SCHEME_SPEC},
+      security: [
+        {
+          // secure all endpoints with 'jwt'
+          jwt: [],
+        },
+      ],
+      servers: [{url: '/'}],
+    });
   }
 
 }
