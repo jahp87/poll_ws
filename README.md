@@ -76,3 +76,11 @@ understand how you can continue to add features to this application.
 
 ## Architure
 
+- services : services to support repetitive functionalities in the application
+- models :  represent domain objects and provide entity relationship models.
+- repositories: represent the Entity layer for a specific model and handle all CRUD operations on the model. They also use repository of other models to handle entity relations.
+- controllers: represent the API Endpoints. These endpoints will have to authenticate incoming request, parse and validate as well as orchestrate calls to repositories.
+- datasources: management of the data source in this with libraries that serve as orm
+- application.ts: API main class
+- index.ts:  api rest start point
+
